@@ -100,28 +100,6 @@ export default function UsagePage() {
         ))}
       </div>
 
-      {/* Energy consumption chart (kWh) */}
-      <section className="usage-chart-section">
-        <div className="usage-chart-header">
-          <h2 className="section-title">Energy Consumption</h2>
-          <span className="chart-badge">kWh</span>
-        </div>
-        <div className="usage-chart-card">
-          {isLoading ? (
-            <div className="chart-loading">Loading historical data...</div>
-          ) : (
-            <LoadChart
-              datasets={energyDatasets}
-              labels={labels}
-              title=""
-              height={340}
-              yAxisLabel="Energy (kWh)"
-              xAxisLabel="Time"
-            />
-          )}
-        </div>
-      </section>
-
       {/* Power load curve (Watts) */}
       <section className="usage-chart-section">
         <div className="usage-chart-header">

@@ -53,6 +53,12 @@ export default function HomePage() {
     { label: 'Load 3 (W)', data: load3.watts, color: '#ff6b6b' },
   ];
 
+  // Total power over time
+  const totalPowerData = load1.watts.map((w, i) => w + (load2.watts[i] || 0) + (load3.watts[i] || 0));
+  const totalPowerDataset = [
+    { label: 'Total Power (W)', data: totalPowerData, color: '#ff9500' },
+  ];
+
   return (
     <div className="home-page" id="home-page">
       <Header title="Dashboard" subtitle="Real-time energy monitoring overview" />
@@ -95,25 +101,24 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="overview-chart-section">
-        <h2 className="section-title">
-          {allEnergyZero ? 'Power Overview' : 'Energy Consumption'}
-        </h2>
+      <section className="total-power-chart-section">
+        <h2 className="section-title">Total Power Consumption</h2>
         <div className="chart-card">
           {isLoading ? (
             <div className="chart-loading">Loading chart data...</div>
           ) : (
             <LoadChart
-              datasets={allEnergyZero ? fallbackDatasets : chartDatasets}
+              datasets={totalPowerDataset}
               labels={labels}
               title=""
               height={300}
-              yAxisLabel={allEnergyZero ? 'Power (W)' : 'Energy (kWh)'}
+              yAxisLabel="Power (W)"
               xAxisLabel="Time"
             />
           )}
         </div>
       </section>
+
     </div>
   );
 }
