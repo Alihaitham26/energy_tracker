@@ -3,6 +3,7 @@ import Header from './Header';
 import TotalCard from './TotalCard';
 import LoadCard from './LoadCard';
 import LoadChart from './LoadChart';
+import { calculateEgyptElectricityBill } from '../electricty-bills';
 import './HomePage.css';
 
 /**
@@ -21,13 +22,15 @@ function buildTimeLabels(load1, load2, load3) {
   return longestTime.map((val) => String(val));
 }
 
-export default function HomePage() {
+export default function HomePage({ loadNames, onChangeLoadName }) {
   const load1 = useLoadData('load11');
   const load2 = useLoadData('load2');
   const load3 = useLoadData('load3');
 
   const isLoading = load1.loading || load2.loading || load3.loading;
   const totalWatts = load1.latestWatts + load2.latestWatts + load3.latestWatts;
+  const names = loadNames || ['Load 1', 'Load 2', 'Load 3'];
+  const getName = (index) => names[index] || `Load ${index + 1}`;
 
   // Build time-based chart labels
   const chartLabels = buildTimeLabels(load1, load2, load3);
@@ -39,18 +42,18 @@ export default function HomePage() {
     : Array.from({ length: maxLen }, (_, i) => `${(i + 1) * 10}s`);
 
   const chartDatasets = [
-    { label: 'Load 1 (kWh)', data: load1.energyKwh, color: '#00CB73' },
-    { label: 'Load 2 (kWh)', data: load2.energyKwh, color: '#00d4ff' },
-    { label: 'Load 3 (kWh)', data: load3.energyKwh, color: '#ff6b6b' },
+    { label: `${getName(0)} (kWh)`, data: load1.energyKwh, color: '#00CB73' },
+    { label: `${getName(1)} (kWh)`, data: load2.energyKwh, color: '#00d4ff' },
+    { label: `${getName(2)} (kWh)`, data: load3.energyKwh, color: '#ff6b6b' },
   ];
 
   // If all energy_kWh values are 0, fall back to watts chart as it has meaningful data
   const allEnergyZero = [...load1.energyKwh, ...load2.energyKwh, ...load3.energyKwh].every(v => v === 0);
 
   const fallbackDatasets = [
-    { label: 'Load 1 (W)', data: load1.watts, color: '#00CB73' },
-    { label: 'Load 2 (W)', data: load2.watts, color: '#00d4ff' },
-    { label: 'Load 3 (W)', data: load3.watts, color: '#ff6b6b' },
+    { label: `${getName(0)} (W)`, data: load1.watts, color: '#00CB73' },
+    { label: `${getName(1)} (W)`, data: load2.watts, color: '#00d4ff' },
+    { label: `${getName(2)} (W)`, data: load3.watts, color: '#ff6b6b' },
   ];
 
   // Total power over time
@@ -58,6 +61,23 @@ export default function HomePage() {
   const totalPowerDataset = [
     { label: 'Total Power (W)', data: totalPowerData, color: '#ff9500' },
   ];
+
+  const totalEnergyNow = load1.totalEnergy + load2.totalEnergy + load3.totalEnergy;
+  const elapsedSeconds = Math.max(
+    load1.time.reduce((sum, value) => sum + (value || 0), 0),
+    load2.time.reduce((sum, value) => sum + (value || 0), 0),
+    load3.time.reduce((sum, value) => sum + (value || 0), 0),
+  );
+
+  const secondsPerMonth = 30 * 24 * 3600;
+  const monthlyEnergyEstimate = elapsedSeconds > 0
+    ? totalEnergyNow * secondsPerMonth / elapsedSeconds
+    : 0;
+
+  const billNow = calculateEgyptElectricityBill(totalEnergyNow);
+  const billMonthly = elapsedSeconds > 0
+    ? calculateEgyptElectricityBill(monthlyEnergyEstimate)
+    : null;
 
   return (
     <div className="home-page" id="home-page">
@@ -73,9 +93,25 @@ export default function HomePage() {
 
       <section className="load-cards-section">
         <h2 className="section-title">Individual Loads</h2>
+
+        <div className="load-name-inputs">
+          {names.map((name, index) => (
+            <label className="load-name-input" key={`load-name-${index}`}>
+              <span>{`Load ${index + 1} Name`}</span>
+              <input
+                className="load-name-field"
+                type="text"
+                value={name}
+                onChange={(event) => onChangeLoadName?.(index, event.target.value)}
+                placeholder={`Load ${index + 1}`}
+              />
+            </label>
+          ))}
+        </div>
+
         <div className="load-cards-grid">
           <LoadCard
-            name="Load 1"
+            name={getName(0)}
             watts={load1.latestWatts}
             amps={load1.latestAmps}
             volts={load1.latestVolts}
@@ -83,7 +119,7 @@ export default function HomePage() {
             loading={load1.loading}
           />
           <LoadCard
-            name="Load 2"
+            name={getName(1)}
             watts={load2.latestWatts}
             amps={load2.latestAmps}
             volts={load2.latestVolts}
@@ -91,13 +127,54 @@ export default function HomePage() {
             loading={load2.loading}
           />
           <LoadCard
-            name="Load 3"
+            name={getName(2)}
             watts={load3.latestWatts}
             amps={load3.latestAmps}
             volts={load3.latestVolts}
             color="var(--load3-color)"
             loading={load3.loading}
           />
+        </div>
+      </section>
+
+      <section className="home-bill-section">
+        <h2 className="section-title">Estimated Electricity Bill</h2>
+        <div className="bill-card">
+          <div className="bill-card-header">
+            <span className="bill-card-title">Current bill estimate</span>
+            <span className="bill-note">Based on recorded kWh and a 30-day projection</span>
+          </div>
+
+          <div className="bill-card-grid">
+            <div className="bill-stat">
+              <span className="bill-label">Recorded energy</span>
+              <span className="bill-value">
+                {isLoading ? '—' : `${totalEnergyNow.toFixed(3)} kWh`}
+              </span>
+            </div>
+            <div className="bill-stat">
+              <span className="bill-label">Elapsed time</span>
+              <span className="bill-value">
+                {elapsedSeconds > 0 ? `${elapsedSeconds.toLocaleString()} s` : '—'}
+              </span>
+            </div>
+            <div className="bill-stat">
+              <span className="bill-label">Current bill</span>
+              <span className="bill-value">
+                {isLoading ? '—' : `${billNow.totalCost.toFixed(2)} EGP`}
+              </span>
+            </div>
+            <div className="bill-stat">
+              <span className="bill-label">Projected monthly bill</span>
+              <span className="bill-value">
+                {isLoading || !billMonthly ? '—' : `${billMonthly.totalCost.toFixed(2)} EGP`}
+              </span>
+            </div>
+          </div>
+
+          <div className="bill-summary">
+            <span>Projected monthly cost assumes current usage rate continues for 30 days.</span>
+          </div>
         </div>
       </section>
 

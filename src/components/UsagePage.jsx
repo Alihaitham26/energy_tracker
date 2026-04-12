@@ -17,12 +17,13 @@ function buildTimeLabels(load1, load2, load3) {
   return longestTime.map((val) => String(val));
 }
 
-export default function UsagePage() {
+export default function UsagePage({ loadNames }) {
   const load1 = useLoadData('load11');
   const load2 = useLoadData('load2');
   const load3 = useLoadData('load3');
 
   const isLoading = load1.loading || load2.loading || load3.loading;
+  const names = loadNames || ['Load 1', 'Load 2', 'Load 3'];
 
   // Build time-based labels
   const maxLen = Math.max(load1.watts.length, load2.watts.length, load3.watts.length);
@@ -33,30 +34,30 @@ export default function UsagePage() {
 
   // Energy (kWh) datasets — primary usage chart
   const energyDatasets = [
-    { label: 'Load 1', data: load1.energyKwh, color: '#00CB73' },
-    { label: 'Load 2', data: load2.energyKwh, color: '#00d4ff' },
-    { label: 'Load 3', data: load3.energyKwh, color: '#ff6b6b' },
+    { label: names[0], data: load1.energyKwh, color: '#00CB73' },
+    { label: names[1], data: load2.energyKwh, color: '#00d4ff' },
+    { label: names[2], data: load3.energyKwh, color: '#ff6b6b' },
   ];
 
   // Power (Watts) datasets
   const wattsDatasets = [
-    { label: 'Load 1', data: load1.watts, color: '#00CB73' },
-    { label: 'Load 2', data: load2.watts, color: '#00d4ff' },
-    { label: 'Load 3', data: load3.watts, color: '#ff6b6b' },
+    { label: names[0], data: load1.watts, color: '#00CB73' },
+    { label: names[1], data: load2.watts, color: '#00d4ff' },
+    { label: names[2], data: load3.watts, color: '#ff6b6b' },
   ];
 
   // Current (Amps) datasets
   const ampsDatasets = [
-    { label: 'Load 1', data: load1.amps, color: '#00CB73' },
-    { label: 'Load 2', data: load2.amps, color: '#00d4ff' },
-    { label: 'Load 3', data: load3.amps, color: '#ff6b6b' },
+    { label: names[0], data: load1.amps, color: '#00CB73' },
+    { label: names[1], data: load2.amps, color: '#00d4ff' },
+    { label: names[2], data: load3.amps, color: '#ff6b6b' },
   ];
 
   // Voltage (Volts) datasets
   const voltsDatasets = [
-    { label: 'Load 1', data: load1.volts, color: '#00CB73' },
-    { label: 'Load 2', data: load2.volts, color: '#00d4ff' },
-    { label: 'Load 3', data: load3.volts, color: '#ff6b6b' },
+    { label: names[0], data: load1.volts, color: '#00CB73' },
+    { label: names[1], data: load2.volts, color: '#00d4ff' },
+    { label: names[2], data: load3.volts, color: '#ff6b6b' },
   ];
 
   // Total energy per load (kWh)
@@ -70,17 +71,17 @@ export default function UsagePage() {
       color: 'var(--primary)',
     },
     {
-      label: 'Load 1 Peak',
+      label: `${names[0]} Peak`,
       value: load1.watts.length > 0 ? `${Math.max(...load1.watts.map(Math.abs)).toFixed(2)} W` : '—',
       color: 'var(--load1-color)',
     },
     {
-      label: 'Load 2 Peak',
+      label: `${names[1]} Peak`,
       value: load2.watts.length > 0 ? `${Math.max(...load2.watts.map(Math.abs)).toFixed(2)} W` : '—',
       color: 'var(--load2-color)',
     },
     {
-      label: 'Load 3 Peak',
+      label: `${names[2]} Peak`,
       value: load3.watts.length > 0 ? `${Math.max(...load3.watts.map(Math.abs)).toFixed(2)} W` : '—',
       color: 'var(--load3-color)',
     },
