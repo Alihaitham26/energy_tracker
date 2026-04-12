@@ -1,0 +1,88 @@
+/* ═══════════════════════════════════════════════
+   Home Page
+   ═══════════════════════════════════════════════ */
+
+.home-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xl);
+  animation: fade-in 0.3s ease-out;
+}
+
+/* Section titles */
+.section-title {
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin-bottom: var(--space-md);
+}
+
+/* Load cards grid */
+.load-cards-section {
+  animation: fade-in 0.5s ease-out 0.2s backwards;
+}
+
+.load-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-md);
+}
+
+/* Chart section */
+.overview-chart-section {
+  animation: fade-in 0.5s ease-out 0.4s backwards;
+}
+
+.chart-card {
+  background: var(--bg-card);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: var(--radius-lg);
+  padding: var(--space-lg);
+  position: relative;
+  overflow: hidden;
+}
+
+.chart-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--primary-dim), transparent);
+}
+
+.load-chart-container {
+  width: 100%;
+  position: relative;
+}
+
+.chart-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 300px;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  letter-spacing: 1px;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .load-cards-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .load-cards-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .home-page {
+    gap: var(--space-lg);
+  }
+}
