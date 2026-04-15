@@ -46,6 +46,20 @@
   left: 100%;
 }
 
+.load-card.over-limit {
+  background: rgba(255, 0, 0, 0.1);
+  border-color: rgba(255, 0, 0, 0.3);
+}
+.load-card.near-limit {
+  background: rgba(255, 255, 0, 0.1);
+  border-color: rgba(255, 255, 0, 0.3);
+}
+
+.load-card.under-limit {
+  background: rgba(0, 255, 0, 0.1);
+  border-color: rgba(0, 255, 0, 0.3);
+}
+
 .load-card:nth-child(1) { animation-delay: 0.1s; }
 .load-card:nth-child(2) { animation-delay: 0.2s; }
 .load-card:nth-child(3) { animation-delay: 0.3s; }
@@ -132,6 +146,32 @@
   width: 1px;
   height: 28px;
   background: rgba(255, 255, 255, 0.06);
+}
+
+/* Uptime */
+.load-card-uptime {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-sm) 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  margin-top: var(--space-sm);
+}
+
+.uptime-label {
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: 500;
+}
+
+.uptime-value {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  font-weight: 600;
+  font-family: var(--font-display);
+  letter-spacing: 0.5px;
 }
 
 /* Status badge */

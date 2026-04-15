@@ -19,47 +19,15 @@ const defaultEgyptResidentialTiers = [
  */
 export function calculateEgyptElectricityBill(energyKwh, options = {}) {
   const { tiers = defaultEgyptResidentialTiers, fixedFee = 0, extraFactor = 1 } = options;
-
-  if (typeof energyKwh !== 'number' || Number.isNaN(energyKwh) || energyKwh < 0) {
-    throw new Error('Energy consumption must be a non-negative number');
-  }
-
-  let remaining = energyKwh;
-  let previousMax = 0;
-  let subtotal = 0;
-  const breakdown = [];
-
-  for (const tier of tiers) {
-    if (remaining <= 0) break;
-
-    const tierLimit = tier.max === Infinity ? remaining : tier.max - previousMax;
-    const tierKwh = Math.min(remaining, tierLimit);
-    if (tierKwh <= 0) {
-      previousMax = tier.max;
-      continue;
-    }
-
-    const tierCost = Number((tierKwh * tier.rate).toFixed(2));
-    breakdown.push({
-      tier: tier.max === Infinity ? `${previousMax + 1}+` : `${previousMax + 1}-${tier.max}`,
-      kwh: Number(tierKwh.toFixed(2)),
-      rate: tier.rate,
-      cost: tierCost,
-    });
-
-    subtotal += tierCost;
-    remaining -= tierKwh;
-    previousMax = tier.max;
-  }
-
-  const totalCost = Number((subtotal * extraFactor + fixedFee).toFixed(2));
+  let rate = tiers.find((cr)=>energyKwh <= cr.max ).rate
+  let totalCost = rate * energyKwh 
 
   return {
     energyKwh: Number(energyKwh.toFixed(2)),
     totalCost,
-    breakdown,
     fixedFee: Number(fixedFee.toFixed(2)),
     extraFactor: Number(extraFactor.toFixed(3)),
+    rate: rate
   };
 }
 

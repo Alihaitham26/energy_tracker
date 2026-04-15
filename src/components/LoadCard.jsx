@@ -1,12 +1,15 @@
 import './LoadCard.css';
 
-export default function LoadCard({ name, watts, amps, volts, color, loading }) {
+export default function LoadCard({ name, watts, amps, volts, color, loading, limit, uptime }) {
   const colorVar = color || 'var(--primary)';
   const isPositive = watts > 0;
+  const isOverLimit = watts > (limit || Infinity)
+  const isNearLimit = watts > (limit * 0.9 || Infinity)
+  const uptimeMinutes = uptime ? uptime.toFixed(2) : 0;
 
   return (
     <div
-      className={`load-card ${loading ? 'loading' : ''}`}
+      className={`load-card ${loading ? 'loading' : ''} ${isOverLimit ? 'over-limit': isNearLimit? 'near-limit' : 'under-limit'}`}
       id={`load-card-${name.toLowerCase().replace(/\s/g, '-')}`}
       style={{ '--card-accent': colorVar }}
     >
@@ -36,6 +39,13 @@ export default function LoadCard({ name, watts, amps, volts, color, loading }) {
             {loading ? '—' : `${Math.abs(volts).toFixed(2)} V`}
           </span>
         </div>
+      </div>
+
+      <div className="load-card-uptime">
+        <span className="uptime-label">Uptime</span>
+        <span className="uptime-value">
+          {loading ? '—' : `${uptimeMinutes} min`}
+        </span>
       </div>
 
       {!loading && (

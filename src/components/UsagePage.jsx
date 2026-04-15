@@ -36,28 +36,28 @@ export default function UsagePage({ loadNames }) {
   const energyDatasets = [
     { label: names[0], data: load1.energyKwh, color: '#00CB73' },
     { label: names[1], data: load2.energyKwh, color: '#00d4ff' },
-    { label: names[2], data: load3.energyKwh, color: '#ff6b6b' },
+    { label: names[2], data: load3.energyKwh, color: '#5d00ff' },
   ];
 
   // Power (Watts) datasets
   const wattsDatasets = [
     { label: names[0], data: load1.watts, color: '#00CB73' },
     { label: names[1], data: load2.watts, color: '#00d4ff' },
-    { label: names[2], data: load3.watts, color: '#ff6b6b' },
+    { label: names[2], data: load3.watts, color: '#5d00ff' },
   ];
 
   // Current (Amps) datasets
   const ampsDatasets = [
     { label: names[0], data: load1.amps, color: '#00CB73' },
     { label: names[1], data: load2.amps, color: '#00d4ff' },
-    { label: names[2], data: load3.amps, color: '#ff6b6b' },
+    { label: names[2], data: load3.amps, color: '#5d00ff' },
   ];
 
   // Voltage (Volts) datasets
   const voltsDatasets = [
     { label: names[0], data: load1.volts, color: '#00CB73' },
     { label: names[1], data: load2.volts, color: '#00d4ff' },
-    { label: names[2], data: load3.volts, color: '#ff6b6b' },
+    { label: names[2], data: load3.volts, color: '#5d00ff' },
   ];
 
   // Total energy per load (kWh)

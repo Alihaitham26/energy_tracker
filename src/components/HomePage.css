@@ -32,7 +32,22 @@
   margin-bottom: var(--space-lg);
 }
 
+.load-limit-inputs {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-md);
+  margin-bottom: var(--space-lg);
+}
+
 .load-name-input {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+}
+
+.load-limit-input {
   display: flex;
   flex-direction: column;
   gap: 0.35rem;
@@ -50,7 +65,23 @@
   transition: border-color var(--transition-base), box-shadow var(--transition-base);
 }
 
+.load-limit-field {
+  width: 100%;
+  border-radius: var(--radius-sm);
+  background: var(--bg-surface);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: var(--text-primary);
+  padding: var(--space-sm);
+  transition: border-color var(--transition-base), box-shadow var(--transition-base);
+}
+
 .load-name-field:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(0, 203, 115, 0.12);
+}
+
+.load-limit-field:focus {
   outline: none;
   border-color: var(--primary);
   box-shadow: 0 0 0 3px rgba(0, 203, 115, 0.12);

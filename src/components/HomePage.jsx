@@ -4,6 +4,7 @@ import TotalCard from './TotalCard';
 import LoadCard from './LoadCard';
 import LoadChart from './LoadChart';
 import { calculateEgyptElectricityBill } from '../electricty-bills';
+import { useState, useEffect } from 'react';
 import './HomePage.css';
 
 /**
@@ -19,13 +20,32 @@ function buildTimeLabels(load1, load2, load3) {
     (best, l) => (l.time.length > best.time.length ? l : best)
   ).time;
 
-  return longestTime.map((val) => String(val));
+  let cumulative = 0;
+  return longestTime.map((val) => {
+    cumulative += val;
+    return cumulative.toFixed(1);
+  });
 }
 
 export default function HomePage({ loadNames, onChangeLoadName }) {
   const load1 = useLoadData('load11');
   const load2 = useLoadData('load2');
   const load3 = useLoadData('load3');
+
+  const [loadLimits, setLoadLimits] = useState({ load11: 1000, load2: 1000, load3: 1000 });
+
+  useEffect(() => {
+    const stored = localStorage.getItem('loadLimits');
+    if (stored) {
+      setLoadLimits(JSON.parse(stored));
+    }
+  }, []);
+
+  const updateLimit = (loadPath, value) => {
+    const newLimits = { ...loadLimits, [loadPath]: value == "" ? "" :Number(value) };
+    setLoadLimits(newLimits);
+    localStorage.setItem('loadLimits', JSON.stringify(newLimits));
+  };
 
   const isLoading = load1.loading || load2.loading || load3.loading;
   const totalWatts = load1.latestWatts + load2.latestWatts + load3.latestWatts;
@@ -39,22 +59,7 @@ export default function HomePage({ loadNames, onChangeLoadName }) {
   const maxLen = Math.max(load1.watts.length, load2.watts.length, load3.watts.length);
   const labels = chartLabels.length > 0
     ? chartLabels
-    : Array.from({ length: maxLen }, (_, i) => `${(i + 1) * 10}s`);
-
-  const chartDatasets = [
-    { label: `${getName(0)} (kWh)`, data: load1.energyKwh, color: '#00CB73' },
-    { label: `${getName(1)} (kWh)`, data: load2.energyKwh, color: '#00d4ff' },
-    { label: `${getName(2)} (kWh)`, data: load3.energyKwh, color: '#ff6b6b' },
-  ];
-
-  // If all energy_kWh values are 0, fall back to watts chart as it has meaningful data
-  const allEnergyZero = [...load1.energyKwh, ...load2.energyKwh, ...load3.energyKwh].every(v => v === 0);
-
-  const fallbackDatasets = [
-    { label: `${getName(0)} (W)`, data: load1.watts, color: '#00CB73' },
-    { label: `${getName(1)} (W)`, data: load2.watts, color: '#00d4ff' },
-    { label: `${getName(2)} (W)`, data: load3.watts, color: '#ff6b6b' },
-  ];
+    : Array.from({ length: maxLen }, (_, i) => `${(i + 1)}m`);
 
   // Total power over time
   const totalPowerData = load1.watts.map((w, i) => w + (load2.watts[i] || 0) + (load3.watts[i] || 0));
@@ -63,19 +68,19 @@ export default function HomePage({ loadNames, onChangeLoadName }) {
   ];
 
   const totalEnergyNow = load1.totalEnergy + load2.totalEnergy + load3.totalEnergy;
-  const elapsedSeconds = Math.max(
+  const elapsedMinutes = Math.max(
     load1.time.reduce((sum, value) => sum + (value || 0), 0),
     load2.time.reduce((sum, value) => sum + (value || 0), 0),
     load3.time.reduce((sum, value) => sum + (value || 0), 0),
   );
 
-  const secondsPerMonth = 30 * 24 * 3600;
-  const monthlyEnergyEstimate = elapsedSeconds > 0
-    ? totalEnergyNow * secondsPerMonth / elapsedSeconds
+  const minutesPerMonth = 30 * 24 * 60;
+  const monthlyEnergyEstimate = elapsedMinutes > 0
+    ? totalEnergyNow * minutesPerMonth / elapsedMinutes
     : 0;
 
   const billNow = calculateEgyptElectricityBill(totalEnergyNow);
-  const billMonthly = elapsedSeconds > 0
+  const billMonthly = elapsedMinutes > 0
     ? calculateEgyptElectricityBill(monthlyEnergyEstimate)
     : null;
 
@@ -109,6 +114,21 @@ export default function HomePage({ loadNames, onChangeLoadName }) {
           ))}
         </div>
 
+        <div className="load-limit-inputs">
+          {['load11', 'load2', 'load3'].map((loadPath, index) => (
+            <label className="load-limit-input" key={`load-limit-${index}`}>
+              <span>{`${getName(index)} Max Watts`}</span>
+              <input
+                className="load-limit-field"
+                type="number"
+                value={loadLimits[loadPath]}
+                onChange={(event) => updateLimit(loadPath, event.target.value)}
+                placeholder="1000"
+              />
+            </label>
+          ))}
+        </div>
+
         <div className="load-cards-grid">
           <LoadCard
             name={getName(0)}
@@ -117,6 +137,8 @@ export default function HomePage({ loadNames, onChangeLoadName }) {
             volts={load1.latestVolts}
             color="var(--load1-color)"
             loading={load1.loading}
+            limit={loadLimits.load11}
+            uptime={load1.uptimeSeconds}
           />
           <LoadCard
             name={getName(1)}
@@ -125,6 +147,8 @@ export default function HomePage({ loadNames, onChangeLoadName }) {
             volts={load2.latestVolts}
             color="var(--load2-color)"
             loading={load2.loading}
+            limit={loadLimits.load2}
+            uptime={load2.uptimeSeconds}
           />
           <LoadCard
             name={getName(2)}
@@ -133,6 +157,8 @@ export default function HomePage({ loadNames, onChangeLoadName }) {
             volts={load3.latestVolts}
             color="var(--load3-color)"
             loading={load3.loading}
+            limit={loadLimits.load3}
+            uptime={load3.uptimeSeconds}
           />
         </div>
       </section>
@@ -155,7 +181,7 @@ export default function HomePage({ loadNames, onChangeLoadName }) {
             <div className="bill-stat">
               <span className="bill-label">Elapsed time</span>
               <span className="bill-value">
-                {elapsedSeconds > 0 ? `${elapsedSeconds.toLocaleString()} s` : '—'}
+                {elapsedMinutes > 1440 ? `${(elapsedMinutes / 1440).toFixed(1)} days` : elapsedMinutes > 60 ? `${(elapsedMinutes / 60).toFixed(1)} hours` : elapsedMinutes > 0 ? `${elapsedMinutes.toFixed(1)} minutes` : '—'}
               </span>
             </div>
             <div className="bill-stat">
@@ -165,7 +191,7 @@ export default function HomePage({ loadNames, onChangeLoadName }) {
               </span>
             </div>
             <div className="bill-stat">
-              <span className="bill-label">Projected monthly bill</span>
+              <span className="bill-label">Estimated monthly bill</span>
               <span className="bill-value">
                 {isLoading || !billMonthly ? '—' : `${billMonthly.totalCost.toFixed(2)} EGP`}
               </span>
@@ -190,7 +216,7 @@ export default function HomePage({ loadNames, onChangeLoadName }) {
               title=""
               height={300}
               yAxisLabel="Power (W)"
-              xAxisLabel="Time"
+              xAxisLabel="Time in minutes"
             />
           )}
         </div>
