@@ -1,0 +1,113 @@
+ {
+  "load11": {
+    "amps": {
+      "-OpnRGIxyT9VDXaPipt_": 13.07,
+      "-OpnRHrBh6Xn9P0aUekv": 1.94,
+      "-OpnRK56CGpwT-TNnjPS": 2,
+      "-OpnRMYIfEl0MssfErHn": 1.89,
+      "-OpnRPvy3sKDN7SpG-mQ": 0.86
+    },
+    "energy_kWh": {
+      "-OpnRGNoZPTS1jSwBfc8": 0,
+      "-OpnRHwU3r3DM6Jok-VY": 0,
+      "-OpnRKAi-mUs4I6ZAnr0": 0,
+      "-OpnRMcMmMWyC9yozDnE": 0,
+      "-OpnRQ-kahQsKU71HDhH": 0
+    },
+    "time": {
+      "-OpnRGGODgRb5P59_Q5y": 10,
+      "-OpnRHpYf8cYvC-iYGOv": 10,
+      "-OpnRK29wKAV3N4DE2YP": 10,
+      "-OpnRMWRIX1QKyf4kxPm": 10,
+      "-OpnRPtOmZTBv_-Hphbh": 10
+    },
+    "volts": {
+      "-OpnRGK9n1Ew6np38s3C": 0.16,
+      "-OpnRHuywZVV4Fhbnjo6": 0.11,
+      "-OpnRK9MTvSXSrIjGsb_": 0.1,
+      "-OpnRMb0kX9kUjCfvIk8": 0.07,
+      "-OpnRPz8Mq_jpcOX8ls0": 0
+    },
+    "watts": {
+      "-OpnRGM9n1Ew6np38s3C": -0.91,
+      "-OpnRHuywZVV4Fhbnjo6": 0.11,
+      "-OpnRK9MTvSXSrIjGsb_": 0.1,
+      "-OpnRMb0kX9kUjCfvIk8": 0.07,
+      "-OpnRPz8Mq_jpcOX8ls0": 0
+    }
+  },
+  "load2": {
+    "amps": {
+      "-OpnRGQy0Cxc1o72vEyd": 22.14,
+      "-OpnRI2vkfGBTPZ87RCu": 17.67,
+      "-OpnRKE98Osk_kbVhqnV": 14.32,
+      "-OpnRMg2eeeqeT5LcAJ_": 17.91,
+      "-OpnRQ8y0Cxc1o72vEyd": 12.5
+    },
+    "energy_kWh": {
+      "-OpnRGQy0Cxc1o72vEyd": 0,
+      "-OpnRI2vkfGBTPZ87RCu": 0,
+      "-OpnRKE98Osk_kbVhqnV": 0,
+      "-OpnRMg2eeeqeT5LcAJ_": 0,
+      "-OpnRQ8y0Cxc1o72vEyd": 0
+    },
+    "time": {
+      "-OpnRGQy0Cxc1o72vEyd": 10,
+      "-OpnRI2vkfGBTPZ87RCu": 10,
+      "-OpnRKE98Osk_kbVhqnV": 10,
+      "-OpnRMg2eeeqeT5LcAJ_": 10,
+      "-OpnRQ8y0Cxc1o72vEyd": 10
+    },
+    "volts": {
+      "-OpnRGQy0Cxc1o72vEyd": 0.22,
+      "-OpnRI2vkfGBTPZ87RCu": 0.18,
+      "-OpnRKE98Osk_kbVhqnV": 0.14,
+      "-OpnRMg2eeeqeT5LcAJ_": 0.18,
+      "-OpnRQ8y0Cxc1o72vEyd": 0.13
+    },
+    "watts": {
+      "-OpnRGQy0Cxc1o72vEyd": 0.22,
+      "-OpnRI2vkfGBTPZ87RCu": 0.18,
+      "-OpnRKE98Osk_kbVhqnV": 0.14,
+      "-OpnRMg2eeeqeT5LcAJ_": 0.18,
+      "-OpnRQ8y0Cxc1o72vEyd": 0.13
+    }
+  },
+  "load3": {
+    "amps": {
+      "-OpnRGQy0Cxc1o72vEyd": 22.14,
+      "-OpnRI2vkfGBTPZ87RCu": 17.67,
+      "-OpnRKE98Osk_kbVhqnV": 14.32,
+      "-OpnRMg2eeeqeT5LcAJ_": 17.91,
+      "-OpnRQ8y0Cxc1o72vEyd": 12.5
+    },
+    "energy_kWh": {
+      "-OpnRGQy0Cxc1o72vEyd": 0,
+      "-OpnRI2vkfGBTPZ87RCu": 0,
+      "-OpnRKE98Osk_kbVhqnV": 0,
+      "-OpnRMg2eeeqeT5LcAJ_": 0,
+      "-OpnRQ8y0Cxc1o72vEyd": 0
+    },
+    "time": {
+      "-OpnRGQy0Cxc1o72vEyd": 10,
+      "-OpnRI2vkfGBTPZ87RCu": 10,
+      "-OpnRKE98Osk_kbVhqnV": 10,
+      "-OpnRMg2eeeqeT5LcAJ_": 10,
+      "-OpnRQ8y0Cxc1o72vEyd": 10
+    },
+    "volts": {
+      "-OpnRGQy0Cxc1o72vEyd": 0.22,
+      "-OpnRI2vkfGBTPZ87RCu": 0.18,
+      "-OpnRKE98Osk_kbVhqnV": 0.14,
+      "-OpnRMg2eeeqeT5LcAJ_": 0.18,
+      "-OpnRQ8y0Cxc1o72vEyd": 0.13
+    },
+    "watts": {
+      "-OpnRGQy0Cxc1o72vEyd": 0.22,
+      "-OpnRI2vkfGBTPZ87RCu": 0.18,
+      "-OpnRKE98Osk_kbVhqnV": 0.14,
+      "-OpnRMg2eeeqeT5LcAJ_": 0.18,
+      "-OpnRQ8y0Cxc1o72vEyd": 0.13
+    }
+  }
+}

@@ -33,6 +33,7 @@ export default function HomePage({ loadNames, onChangeLoadName }) {
   const load3 = useLoadData('load3');
 
   const [loadLimits, setLoadLimits] = useState({ load11: 1000, load2: 1000, load3: 1000 });
+  const [maxLoad, setMaxLoad] = useState({});
 
   useEffect(() => {
     const stored = localStorage.getItem('loadLimits');
@@ -40,6 +41,27 @@ export default function HomePage({ loadNames, onChangeLoadName }) {
       setLoadLimits(JSON.parse(stored));
     }
   }, []);
+  // get max load
+  useEffect(() => {
+    // set maxload to the load with the highest latestWatts
+    const loads = [
+      { name: loadNames?.[0] || 'Load 1', watts: load1.latestWatts },
+      { name: loadNames?.[1] || 'Load 2', watts: load2.latestWatts },
+      { name: loadNames?.[2] || 'Load 3', watts: load3.latestWatts },
+    ];
+    // get maxload limit from loadLimits
+    let indexOfMax = 0;
+    for (let i = 1; i < loads.length; i++) {
+      if (loads[i].watts > loads[indexOfMax].watts) {
+        indexOfMax = i;
+      }
+    }
+    const max = loads[indexOfMax];
+    max.limit = loadLimits[`load${indexOfMax === 0 ? '11' : indexOfMax + 1}`] || 1000;
+
+    setMaxLoad(max);
+  }, [load1, load2, load3]);
+
 
   const updateLimit = (loadPath, value) => {
     const newLimits = { ...loadLimits, [loadPath]: value == "" ? "" :Number(value) };
@@ -87,7 +109,10 @@ export default function HomePage({ loadNames, onChangeLoadName }) {
   return (
     <div className="home-page" id="home-page">
       <Header title="Dashboard" subtitle="Real-time energy monitoring overview" />
-
+      <div className="warning-banner" style={{"backgroundColor" : maxLoad.watts > maxLoad.limit ? 'var(--warning-bg)' : maxLoad.watts > 0.9 * maxLoad.limit ? 'var(--warning-bg-light)' : 'var(--normal-bg)'}}>
+        <span className="warning-icon">🔌</span>
+        <span className="warning-text" style={{"textDecoration":"capital"}}>the most consuming device is {maxLoad.name?.toLocaleUpperCase()}</span>
+      </div>
       <TotalCard
         totalWatts={totalWatts}
         load1Watts={load1.latestWatts}

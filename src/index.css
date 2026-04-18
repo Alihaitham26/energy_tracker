@@ -63,6 +63,9 @@
 
   /* Sidebar width */
   --sidebar-width: 240px;
+  --warning-bg: rgba(255, 0, 0, 0.5);
+  --warning-bg-light: rgba(255, 247, 0, 0.6);
+  --normal-bg: rgba(0, 255, 0, 0.5);
 }
 
 /* Reset */
