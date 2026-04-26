@@ -60,6 +60,12 @@
   border-color: rgba(0, 255, 0, 0.3);
 }
 
+.load-card.closed {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.1);
+  color: var(--text-muted);
+}
+
 .load-card:nth-child(1) { animation-delay: 0.1s; }
 .load-card:nth-child(2) { animation-delay: 0.2s; }
 .load-card:nth-child(3) { animation-delay: 0.3s; }

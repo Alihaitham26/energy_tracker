@@ -28,28 +28,22 @@ function buildTimeLabels(load1, load2, load3) {
 }
 
 export default function HomePage({ loadNames, onChangeLoadName }) {
-  const load1 = useLoadData('load11');
+  const load1 = useLoadData('load1');
   const load2 = useLoadData('load2');
   const load3 = useLoadData('load3');
 
-  const [loadLimits, setLoadLimits] = useState({ load11: 1000, load2: 1000, load3: 1000 });
   const [maxLoad, setMaxLoad] = useState({});
+  const [limitInputs, setLimitInputs] = useState({ load11: '', load2: '', load3: '' });
 
-  useEffect(() => {
-    const stored = localStorage.getItem('loadLimits');
-    if (stored) {
-      setLoadLimits(JSON.parse(stored));
-    }
-  }, []);
   // get max load
   useEffect(() => {
     // set maxload to the load with the highest latestWatts
     const loads = [
-      { name: loadNames?.[0] || 'Load 1', watts: load1.latestWatts },
-      { name: loadNames?.[1] || 'Load 2', watts: load2.latestWatts },
-      { name: loadNames?.[2] || 'Load 3', watts: load3.latestWatts },
+      { name: loadNames?.[0] || 'Load 1', watts: load1.latestWatts, limit: load1.limit },
+      { name: loadNames?.[1] || 'Load 2', watts: load2.latestWatts, limit: load2.limit },
+      { name: loadNames?.[2] || 'Load 3', watts: load3.latestWatts, limit: load3.limit },
     ];
-    // get maxload limit from loadLimits
+    // get maxload limit from loads
     let indexOfMax = 0;
     for (let i = 1; i < loads.length; i++) {
       if (loads[i].watts > loads[indexOfMax].watts) {
@@ -57,16 +51,45 @@ export default function HomePage({ loadNames, onChangeLoadName }) {
       }
     }
     const max = loads[indexOfMax];
-    max.limit = loadLimits[`load${indexOfMax === 0 ? '11' : indexOfMax + 1}`] || 1000;
 
     setMaxLoad(max);
-  }, [load1, load2, load3]);
+  }, [loadNames, load1.latestWatts, load2.latestWatts, load3.latestWatts, load1.limit, load2.limit, load3.limit]);
+
+  // Update limit inputs when Firebase values change (one effect per limit)
+  useEffect(() => {
+    setLimitInputs(prev => ({
+      ...prev,
+      load11: load1.limit === 999999 ? '' : load1.limit,
+    }));
+  }, [load1.limit]);
+
+  useEffect(() => {
+    setLimitInputs(prev => ({
+      ...prev,
+      load2: load2.limit === 999999 ? '' : load2.limit,
+    }));
+  }, [load2.limit]);
+
+  useEffect(() => {
+    setLimitInputs(prev => ({
+      ...prev,
+      load3: load3.limit === 999999 ? '' : load3.limit,
+    }));
+  }, [load3.limit]);
 
 
   const updateLimit = (loadPath, value) => {
-    const newLimits = { ...loadLimits, [loadPath]: value == "" ? "" :Number(value) };
-    setLoadLimits(newLimits);
-    localStorage.setItem('loadLimits', JSON.stringify(newLimits));
+    setLimitInputs(prev => ({ ...prev, [loadPath]: value }));
+  };
+
+  const saveLimitToFirebase = (loadPath, value) => {
+    if (loadPath === 'load11') {
+      load1.updateLimit(value);
+    } else if (loadPath === 'load2') {
+      load2.updateLimit(value);
+    } else if (loadPath === 'load3') {
+      load3.updateLimit(value);
+    }
   };
 
   const isLoading = load1.loading || load2.loading || load3.loading;
@@ -140,15 +163,25 @@ export default function HomePage({ loadNames, onChangeLoadName }) {
         </div>
 
         <div className="load-limit-inputs">
-          {['load11', 'load2', 'load3'].map((loadPath, index) => (
+          {[
+            { path: 'load11', index: 0, limit: load1.limit },
+            { path: 'load2', index: 1, limit: load2.limit },
+            { path: 'load3', index: 2, limit: load3.limit },
+          ].map(({ path, index, limit: currentLimit }) => (
             <label className="load-limit-input" key={`load-limit-${index}`}>
               <span>{`${getName(index)} Max Watts`}</span>
               <input
                 className="load-limit-field"
                 type="number"
-                value={loadLimits[loadPath]}
-                onChange={(event) => updateLimit(loadPath, event.target.value)}
-                placeholder="1000"
+                value={limitInputs[path]}
+                onChange={(event) => updateLimit(path, event.target.value)}
+                onBlur={(event) => saveLimitToFirebase(path, event.target.value)}
+                onKeyDown={(event) => {
+                  if (event.key === 'Enter') {
+                    saveLimitToFirebase(path, event.target.value);
+                  }
+                }}
+                placeholder="No limit"
               />
             </label>
           ))}
@@ -162,8 +195,9 @@ export default function HomePage({ loadNames, onChangeLoadName }) {
             volts={load1.latestVolts}
             color="var(--load1-color)"
             loading={load1.loading}
-            limit={loadLimits.load11}
+            limit={load1.limit}
             uptime={load1.uptimeSeconds}
+            pin={18}
           />
           <LoadCard
             name={getName(1)}
@@ -172,8 +206,9 @@ export default function HomePage({ loadNames, onChangeLoadName }) {
             volts={load2.latestVolts}
             color="var(--load2-color)"
             loading={load2.loading}
-            limit={loadLimits.load2}
+            limit={load2.limit}
             uptime={load2.uptimeSeconds}
+            pin={19}
           />
           <LoadCard
             name={getName(2)}
@@ -182,8 +217,9 @@ export default function HomePage({ loadNames, onChangeLoadName }) {
             volts={load3.latestVolts}
             color="var(--load3-color)"
             loading={load3.loading}
-            limit={loadLimits.load3}
+            limit={load3.limit}
             uptime={load3.uptimeSeconds}
+            pin={20}
           />
         </div>
       </section>

@@ -34,8 +34,6 @@ ChartJS.register(
  */
 export default function LoadChart({ datasets = [], labels = [], title = '', height = 350, yAxisLabel = 'Watts (W)', xAxisLabel = 'Time (s)' }) {
   const chartRef = useRef(null);
-  console.log('Rendering LoadChart with datasets:', datasets);
-  console.log(datasets)
   const chartData = {
     labels,
     datasets: datasets.map((ds,i) => ({

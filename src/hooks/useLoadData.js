@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { ref, onValue, off } from 'firebase/database';
+import { ref, onValue, off, set, get } from 'firebase/database';
 import { database } from '../firebase';
 
 // Fallback data from Database.json
@@ -144,6 +144,7 @@ export function useLoadData(loadPath) {
     loading: true,
     error: null,
   });
+  const [limit, setLimit] = useState(999999);
 
   useEffect(() => {
     if (!loadPath) {
@@ -176,11 +177,15 @@ export function useLoadData(loadPath) {
         const energyMap = val.energy_kWh || {};
         const timeMap = val.time || {};
 
-        // Extract and sort by push key (chronological order)
+        // Extract and sort by push key (chronological order) - includes all values
         const sortedEntries = (map) => {
           return Object.entries(map)
             .sort(([keyA], [keyB]) => keyA.localeCompare(keyB))
-            .map(([, value]) => Number(value));
+            .map(([, value]) => {
+              const num = Number(value);
+              // Include all values, even if they're 0
+              return num;
+            });
         };
 
         const wattsArr = sortedEntries(wattsMap);
@@ -249,16 +254,50 @@ export function useLoadData(loadPath) {
     return () => off(loadRef, 'value', listener);
   }, [loadPath]);
 
-  // Computed values
-  const latestWatts = data.watts.length > 0 ? data.watts[data.watts.length - 1] : 0;
-  const latestAmps = data.amps.length > 0 ? data.amps[data.amps.length - 1] : 0;
-  const latestVolts = data.volts.length > 0 ? data.volts[data.volts.length - 1] : 0;
-  const totalEnergy = data.energyKwh.length > 0 ? data.energyKwh[data.energyKwh.length - 1] : 0;
+  // Load and manage limit from Firebase
+  useEffect(() => {
+    if (!loadPath) return;
 
-  // Get limit from localStorage
-  const loadLimits = JSON.parse(localStorage.getItem('loadLimits') || '{}');
-  const limit = loadLimits[loadPath] || 1000; // Default 1000W
-  console.log({ ...data,latestWatts,latestAmps,latestVolts,totalEnergy,limit,})
+    const limitRef = ref(database, `${loadPath}/limit`);
+
+    // Get initial limit value
+    get(limitRef).then((snapshot) => {
+      const value = snapshot.val();
+      if (value === null || value === undefined) {
+        // Limit doesn't exist, set to 999999 (unlimited)
+        set(limitRef, 999999);
+        setLimit(999999);
+      } else {
+        setLimit(Number(value));
+      }
+    }).catch(error => console.error(`Error reading limit for ${loadPath}:`, error));
+
+    // Subscribe to limit changes
+    const listener = onValue(limitRef, (snapshot) => {
+      const value = snapshot.val();
+      if (value === null || value === undefined) {
+        setLimit(999999);
+      } else {
+        setLimit(Number(value));
+      }
+    });
+
+    return () => off(limitRef, 'value', listener);
+  }, [loadPath]);
+
+  // Computed values - get the absolute last read, including zeros
+  const latestWatts = data.watts && data.watts.length > 0 ? data.watts[data.watts.length - 1] : 0;
+  const latestAmps = data.amps && data.amps.length > 0 ? data.amps[data.amps.length - 1] : 0;
+  const latestVolts = data.volts && data.volts.length > 0 ? data.volts[data.volts.length - 1] : 0;
+  const totalEnergy = data.energyKwh && data.energyKwh.length > 0 ? data.energyKwh[data.energyKwh.length - 1] : 0;
+
+  // Function to update limit in Firebase
+  const updateLimit = (newLimit) => {
+    const limitRef = ref(database, `${loadPath}/limit`);
+    const value = newLimit === "" || newLimit === null ? 999999 : Number(newLimit);
+    set(limitRef, value);
+  };
+
   return {
     ...data,
     latestWatts,
@@ -266,5 +305,6 @@ export function useLoadData(loadPath) {
     latestVolts,
     totalEnergy,
     limit,
+    updateLimit,
   };
 }

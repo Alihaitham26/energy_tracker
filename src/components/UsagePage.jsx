@@ -18,7 +18,7 @@ function buildTimeLabels(load1, load2, load3) {
 }
 
 export default function UsagePage({ loadNames }) {
-  const load1 = useLoadData('load11');
+  const load1 = useLoadData('load1');
   const load2 = useLoadData('load2');
   const load3 = useLoadData('load3');
 
