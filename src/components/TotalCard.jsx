@@ -1,6 +1,6 @@
 import './TotalCard.css';
 
-export default function TotalCard({ totalWatts, load1Watts, load2Watts, load3Watts, loading }) {
+export default function TotalCard({ totalWatts, load1Watts, load2Watts, load3Watts, loading , load1Name, load2Name, load3Name}) {
   return (
     <div className="total-card" id="total-consumption-card">
       <div className="total-card-inner">
@@ -21,17 +21,17 @@ export default function TotalCard({ totalWatts, load1Watts, load2Watts, load3Wat
         <div className="total-card-breakdown">
           <div className="breakdown-item">
             <span className="breakdown-dot" style={{ background: 'var(--load1-color)' }}></span>
-            <span className="breakdown-label">Load 1</span>
+            <span className="breakdown-label">{load1Name}</span>
             <span className="breakdown-value">{loading ? '—' : `${Math.abs(load1Watts).toFixed(2)} W`}</span>
           </div>
           <div className="breakdown-item">
             <span className="breakdown-dot" style={{ background: 'var(--load2-color)' }}></span>
-            <span className="breakdown-label">Load 2</span>
+            <span className="breakdown-label">{load2Name}</span>
             <span className="breakdown-value">{loading ? '—' : `${Math.abs(load2Watts).toFixed(2)} W`}</span>
           </div>
           <div className="breakdown-item">
             <span className="breakdown-dot" style={{ background: 'var(--load3-color)' }}></span>
-            <span className="breakdown-label">Load 3</span>
+            <span className="breakdown-label">{load3Name}</span>
             <span className="breakdown-value">{loading ? '—' : `${Math.abs(load3Watts).toFixed(2)} W`}</span>
           </div>
         </div>

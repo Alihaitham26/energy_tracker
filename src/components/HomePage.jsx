@@ -159,6 +159,9 @@ export default function HomePage({ loadNames, onChangeLoadName }) {
         load2Watts={load2.latestWatts}
         load3Watts={load3.latestWatts}
         loading={isLoading}
+        load1Name={getName(0)}
+        load2Name={getName(1)}
+        load3Name={getName(2)}
       />
 
       <section className="load-cards-section">
