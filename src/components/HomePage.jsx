@@ -27,6 +27,22 @@ function buildTimeLabels(load1, load2, load3) {
   });
 }
 
+/**
+ * Get the start index for the last hour of data.
+ * Returns the index from which to slice the arrays to get only the last hour.
+ */
+function getLastHourStartIndex(timeArray) {
+  const oneHourSeconds = 3600; // 1 hour = 3600 seconds
+  let cumulativeTime = 0;
+  for (let i = timeArray.length - 1; i >= 0; i--) {
+    cumulativeTime += timeArray[i] || 0;
+    if (cumulativeTime >= oneHourSeconds) {
+      return i;
+    }
+  }
+  return 0; // If less than 1 hour of data, return all
+}
+
 export default function HomePage({ loadNames, onChangeLoadName }) {
   const load1 = useLoadData('load1');
   const load2 = useLoadData('load2');
@@ -98,30 +114,31 @@ export default function HomePage({ loadNames, onChangeLoadName }) {
   const getName = (index) => names[index] || `Load ${index + 1}`;
 
   // Build time-based chart labels
-  const chartLabels = buildTimeLabels(load1, load2, load3);
+  // Get start indices for last hour
+  const startIndex1 = getLastHourStartIndex(load1.time);
+  const startIndex2 = getLastHourStartIndex(load2.time);
+  const startIndex3 = getLastHourStartIndex(load3.time);
 
+  // Slice data to last hour
+  const load1Watts = load1.watts.slice(startIndex1);
+  const load2Watts = load2.watts.slice(startIndex2);
+  const load3Watts = load3.watts.slice(startIndex3);
   // Fallback if no time data
-  const maxLen = Math.max(load1.watts.length, load2.watts.length, load3.watts.length);
-  const labels = chartLabels.length > 0
-    ? chartLabels
-    : Array.from({ length: maxLen }, (_, i) => `${(i + 1)}m`);
+  const maxLen = Math.max(load1Watts.length, load2Watts.length, load3Watts.length);
+  const labels = Array.from({ length: maxLen }, (_, i) => `${(i*10)}s`);
 
   // Total power over time
-  const totalPowerData = load1.watts.map((w, i) => w + (load2.watts[i] || 0) + (load3.watts[i] || 0));
+  const totalPowerData = load1Watts.map((w, i) => w + (load2Watts[i] || 0) + (load3Watts[i] || 0));
   const totalPowerDataset = [
     { label: 'Total Power (W)', data: totalPowerData, color: '#ff9500' },
   ];
 
   const totalEnergyNow = load1.totalEnergy + load2.totalEnergy + load3.totalEnergy;
-  const elapsedMinutes = Math.max(
-    load1.time.reduce((sum, value) => sum + (value || 0), 0),
-    load2.time.reduce((sum, value) => sum + (value || 0), 0),
-    load3.time.reduce((sum, value) => sum + (value || 0), 0),
-  );
+  const elapsedMinutes = Math.max(load1Watts.length, load2Watts.length, load3Watts.length) / 6
 
   const minutesPerMonth = 30 * 24 * 60;
   const monthlyEnergyEstimate = elapsedMinutes > 0
-    ? totalEnergyNow * minutesPerMonth / elapsedMinutes
+    ? totalEnergyNow/1000 * minutesPerMonth / elapsedMinutes
     : 0;
 
   const billNow = calculateEgyptElectricityBill(totalEnergyNow);
@@ -236,7 +253,7 @@ export default function HomePage({ loadNames, onChangeLoadName }) {
             <div className="bill-stat">
               <span className="bill-label">Recorded energy</span>
               <span className="bill-value">
-                {isLoading ? '—' : `${totalEnergyNow.toFixed(3)} kWh`}
+                {isLoading ? '—' : totalEnergyNow < 1000 ? `${totalEnergyNow.toFixed(3)} Wh` : `${(totalEnergyNow / 1000).toFixed(3)} kWh`}
               </span>
             </div>
             <div className="bill-stat">
@@ -277,7 +294,7 @@ export default function HomePage({ loadNames, onChangeLoadName }) {
               title=""
               height={300}
               yAxisLabel="Power (W)"
-              xAxisLabel="Time in minutes"
+              xAxisLabel="Time in seconds"
             />
           )}
         </div>
