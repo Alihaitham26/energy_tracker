@@ -224,7 +224,7 @@ export function useLoadData(loadPath) {
         setData({
           watts: wattsArr,
           amps: ampsArr,
-          volts: voltsArr.slice(200),
+          volts: voltsArr,
           energyKwh: calculatedEnergyArr, // Use calculated cumulative energy
           time: timeArr,
           entries,
