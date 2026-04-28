@@ -44,7 +44,7 @@ export default function LoadCard({ name, watts, amps, volts, color, loading, lim
         <div className="load-card-metric">
           <span className="metric-label">Current</span>
           <span className="metric-value">
-            {loading ? '—' : `${(Math.abs(amps) * 1000).toFixed(0)} mA`}
+            {loading ? '—' : `${(Math.abs(amps)).toFixed(0)} mA`}
           </span>
         </div>
         <div className="load-card-divider"></div>
